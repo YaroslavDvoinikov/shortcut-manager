@@ -1,15 +1,6 @@
-import os
-import sys
-from pydoc import describe
-from this import s
-
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QEvent, QObject, Qt
-from PySide6.QtGui import QKeySequence
-
-os.environ.pop("QT_STYLE_OVERRIDE", None)
-os.environ["QT_LOGGING_RULES"] = "qt.qpa.wayland.textinput=false"
-
+from PySide6 import QtWidgets
+from PySide6.QtCore import QEvent, QObject
+from PySide6.QtGui import QKeySequence, Qt
 
 command_id_to_name = {0: "Run an executable", 1: "Take screenshot"}
 
@@ -85,7 +76,7 @@ class KeyCombinationDialog(QtWidgets.QDialog):
         return self.key_combination
 
 
-class CreateShortcutWindow(QtWidgets.QDialog):
+class CreateShortcutDialog(QtWidgets.QDialog):
     def __init__(self, shortcut_data, parent=None):
         super().__init__(parent)
         self.shortcut_data = shortcut_data
@@ -198,157 +189,3 @@ class CreateShortcutWindow(QtWidgets.QDialog):
         selected_command = self.selected_command
         description = self.description_input.text().strip()
         return Shortcut([name, key_combination, selected_command, description])
-
-
-class SettingsWindow(QtWidgets.QDialog):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.setWindowTitle("Settings")
-
-        theme_layout = QtWidgets.QHBoxLayout()
-
-        self.theme_label = QtWidgets.QLabel("Theme")
-        self.theme_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.theme_group = QtWidgets.QGroupBox()
-        self.theme_group.setLayout(theme_layout)
-
-        self.dark_radio = QtWidgets.QRadioButton("Dark")
-        theme_layout.addWidget(self.dark_radio)
-        self.light_radio = QtWidgets.QRadioButton("Light")
-        theme_layout.addWidget(self.light_radio)
-
-        self.import_settings_button = QtWidgets.QPushButton("Import Settings")
-        self.export_settings_button = QtWidgets.QPushButton("Export Settings")
-
-        main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.addWidget(self.theme_label)
-        main_layout.addWidget(self.theme_group)
-        main_layout.addWidget(self.import_settings_button)
-        main_layout.addWidget(self.export_settings_button)
-
-
-class MainWindow(QtWidgets.QListWidget):
-    def __init__(self):
-        super().__init__()
-        self.shortcut_data: dict[str, Shortcut] = {}
-        self.on_launch()
-
-        self.setWindowTitle("Shortcut Manager")
-
-        self.open_settings_button = QtWidgets.QPushButton("Settings")
-        self.open_settings_button.clicked.connect(self.open_settings)
-        self.create_new_shortcut = QtWidgets.QPushButton("Create shortcut")
-        self.create_new_shortcut.clicked.connect(self.open_create_shortcut_window)
-
-        # Table with shortcuts
-        self.shortcut_table = QtWidgets.QTableWidget()
-        self.shortcut_table.setColumnCount(4)
-        self.shortcut_table.setHorizontalHeaderLabels(
-            ["Name", "Combination", "Action", "Description"]
-        )
-        self.shortcut_table.resizeColumnsToContents()
-        self.shortcut_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-
-        # Layout of an application
-        main_layout = QtWidgets.QVBoxLayout(self)
-
-        waybar_layout = QtWidgets.QHBoxLayout()
-        waybar_layout.addWidget(self.open_settings_button)
-        waybar_layout.addWidget(self.create_new_shortcut)
-
-        main_layout.addLayout(waybar_layout)
-        main_layout.addWidget(self.shortcut_table)
-
-    def open_settings(self):
-        settings = SettingsWindow(self)
-        settings.exec()
-
-    def on_launch(self):
-        """Method which launches on the start of application"""
-        self.load_shortcuts()
-        self.load_settings()
-        self.create_shortcut_table()
-
-    def load_settings(self):
-        """Loads default settings file, applies settings"""
-        pass
-
-    def load_shortcuts(self):
-        """Loads default shortcuts file and updates the self.shortcut_data"""
-        pass
-
-    def import_settings(self):
-        """Import settings from a file, changes content of default settings file"""
-        pass
-
-    def export_settings(self):
-        """Export settings from default settings file to a created or existing file"""
-        pass
-
-    def import_shortcuts(self):
-        """Import shortcuts from a file, changes content of default shortcuts file"""
-        pass
-
-    def export_shortcuts(self):
-        """Export shortcuts from default settings file to a created or existing file"""
-        pass
-
-    def update_settings(self, theme=None):
-        """Update settings file with new settings, applies settings"""
-        pass
-
-    def update_shortcut_file(self, shortcut_to_add=None, shortcut_to_delete=None):
-        """Update shortcut file with new shortcuts"""
-        pass
-
-    def create_shortcut_table(self):
-        """Creates table to view all shortcuts upon launch"""
-        pass
-
-    def update_shortcut_table(self, shortcut_to_add=None, shortcut_to_delete=None):
-        if shortcut_to_add:
-            row_pos = self.shortcut_table.rowCount()
-            self.shortcut_table.insertRow(row_pos)
-            self.shortcut_table.setItem(
-                row_pos, 0, QtWidgets.QTableWidgetItem(shortcut_to_add.name)
-            )
-            self.shortcut_table.setItem(
-                row_pos,
-                1,
-                QtWidgets.QTableWidgetItem(
-                    QKeySequence(shortcut_to_add.combination).toString()
-                ),
-            )
-            self.shortcut_table.setItem(
-                row_pos,
-                2,
-                QtWidgets.QTableWidgetItem(command_id_to_name[shortcut_to_add.command]),
-            )
-            self.shortcut_table.setItem(
-                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description)
-            )
-        if shortcut_to_delete:
-            pass
-
-        self.shortcut_table.resizeColumnsToContents()
-
-    def open_create_shortcut_window(self):
-        create_shortcut_window = CreateShortcutWindow(self.shortcut_data, parent=self)
-        create_shortcut_window.resize(600, 400)
-        result = create_shortcut_window.exec()
-        if result == QtWidgets.QDialog.Accepted:
-            shortcut = create_shortcut_window.get_data()
-            self.shortcut_data[shortcut.name] = shortcut
-            self.update_shortcut_table(shortcut_to_add=shortcut)
-            self.update_shortcut_file(shortcut_to_add=shortcut)
-            print(shortcut)
-
-
-def run():
-    app = QtWidgets.QApplication([])
-    widget = MainWindow()
-    widget.resize(800, 600)
-    widget.show()
-    sys.exit(app.exec())
