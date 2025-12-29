@@ -1,19 +1,11 @@
+from imaplib import Commands
+
 from PySide6 import QtWidgets
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QKeyCombination, QObject
 from PySide6.QtGui import QKeySequence, Qt
 
-command_id_to_name = {0: "Run an executable", 1: "Take screenshot"}
-
-
-class Shortcut:
-    def __init__(self, data: list):
-        self.name = data[0]
-        self.combination = data[1]
-        self.command = data[2]
-        self.description = data[3]
-
-    def __str__(self):
-        return f"\n Name: {self.name}\n Combination: {self.combination}\n Command: {self.command}\n Description: {self.description}\n"
+from src.shortcut import Shortcut
+from src.shortcuts import Shortcuts
 
 
 # Key listener class
@@ -77,9 +69,9 @@ class KeyCombinationDialog(QtWidgets.QDialog):
 
 
 class CreateShortcutDialog(QtWidgets.QDialog):
-    def __init__(self, shortcut_data, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.shortcut_data = shortcut_data
+        self.shortcut_data = Shortcuts().get_shortcuts()
 
         self.setWindowTitle("Create Shortcut")
         self.selected_command = None
@@ -165,6 +157,13 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         if self.key_combination is None:
             self.error_label.setText("Key combination must be selected!")
             return
+        else:
+            for shortcut in Shortcuts().get_shortcuts().values():
+                if shortcut.combination == self.key_combination.toCombined():
+                    self.error_label.setText(
+                        "Shortcut with this key combination already exists!"
+                    )
+                    return
 
         if self.selected_command is None:
             self.error_label.setText("Command must be selected!")
@@ -185,7 +184,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
 
     def get_data(self) -> Shortcut:
         name = self.name_input.text().strip()
-        key_combination = self.key_combination
+        key_combination = self.key_combination.toCombined()
         selected_command = self.selected_command
         description = self.description_input.text().strip()
         return Shortcut([name, key_combination, selected_command, description])

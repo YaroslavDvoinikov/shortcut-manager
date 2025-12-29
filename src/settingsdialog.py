@@ -2,7 +2,8 @@ from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog
 
-from settings import Settings
+from src.settings import Settings
+from src.theme import reload_theme
 
 
 class SettingsDialog(QtWidgets.QDialog):
@@ -24,7 +25,7 @@ class SettingsDialog(QtWidgets.QDialog):
         theme_layout.addWidget(self.dark_radio)
         self.light_radio = QtWidgets.QRadioButton("Light")
         theme_layout.addWidget(self.light_radio)
-        if self.__settings.get_setting('theme') == 'light':
+        if self.__settings.get_setting("theme") == "light":
             self.dark_radio.setChecked(False)
             self.light_radio.setChecked(True)
         else:
@@ -33,31 +34,43 @@ class SettingsDialog(QtWidgets.QDialog):
 
         def set_light(checked: bool):
             if checked:
-                self.__settings.set_setting('theme', 'light')
+                self.__settings.set_setting("theme", "light")
+                reload_theme()
+
         def set_dark(checked: bool):
             if checked:
-                self.__settings.set_setting('theme', 'dark')
+                self.__settings.set_setting("theme", "dark")
+                reload_theme()
+
         self.light_radio.toggled.connect(set_light)
         self.dark_radio.toggled.connect(set_dark)
 
         self.import_settings_button = QtWidgets.QPushButton("Import Settings")
+
         def on_click_import_settings():
-            file = QFileDialog.getOpenFileName(self, caption="Select settings", filter="Setting Files (*.json)")
+            file = QFileDialog.getOpenFileName(
+                self, caption="Import Settings", filter="Setting Files (*.json)"
+            )
             if file[0] != "":
                 self.__settings.replace_settings_file(file[0])
-                if self.__settings.get_setting('theme') == 'light':
+                if self.__settings.get_setting("theme") == "light":
                     self.dark_radio.setChecked(False)
                     self.light_radio.setChecked(True)
                 else:
                     self.dark_radio.setChecked(True)
                     self.light_radio.setChecked(False)
+
         self.import_settings_button.clicked.connect(on_click_import_settings)
         self.export_settings_button = QtWidgets.QPushButton("Export Settings")
+
         def on_click_export_settings():
-            file = QFileDialog.getOpenFileName(self, caption="Select settings", filter="Setting Files (*.json)")
+            file = QFileDialog.getSaveFileName(
+                self, caption="Export Settings", filter="Setting Files (*.json)"
+            )
             print(file)
             if file[0] != "":
                 self.__settings.save_settings_file(file[0])
+
         self.export_settings_button.clicked.connect(on_click_export_settings)
 
         main_layout = QtWidgets.QVBoxLayout(self)

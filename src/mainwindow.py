@@ -1,15 +1,16 @@
 from PySide6 import QtWidgets
 from PySide6.QtGui import QKeySequence
 
-from src.createshortcutdialog import Shortcut, CreateShortcutDialog, command_id_to_name
+from src.createshortcutdialog import CreateShortcutDialog
 from src.settingsdialog import SettingsDialog
+from src.shortcut import Shortcut
+from src.shortcuts import Shortcuts, command_id_to_name
 
 
 class MainWindow(QtWidgets.QListWidget):
     def __init__(self):
         super().__init__()
-        self.shortcut_data: dict[str, Shortcut] = {}
-        self.on_launch()
+        self.__shortcuts = Shortcuts()
 
         self.setWindowTitle("Shortcut Manager")
 
@@ -37,31 +38,11 @@ class MainWindow(QtWidgets.QListWidget):
         main_layout.addLayout(waybar_layout)
         main_layout.addWidget(self.shortcut_table)
 
+        self.create_shortcut_table()
+
     def open_settings(self):
         settings = SettingsDialog(self)
         settings.exec()
-
-    def on_launch(self):
-        """Method which launches on the start of application"""
-        self.load_shortcuts()
-        self.load_settings()
-        self.create_shortcut_table()
-
-    def load_settings(self):
-        """Loads default settings file, applies settings"""
-        pass
-
-    def load_shortcuts(self):
-        """Loads default shortcuts file and updates the self.shortcut_data"""
-        pass
-
-    def import_settings(self):
-        """Import settings from a file, changes content of default settings file"""
-        pass
-
-    def export_settings(self):
-        """Export settings from default settings file to a created or existing file"""
-        pass
 
     def import_shortcuts(self):
         """Import shortcuts from a file, changes content of default shortcuts file"""
@@ -71,17 +52,28 @@ class MainWindow(QtWidgets.QListWidget):
         """Export shortcuts from default settings file to a created or existing file"""
         pass
 
-    def update_settings(self, theme=None):
-        """Update settings file with new settings, applies settings"""
-        pass
-
-    def update_shortcut_file(self, shortcut_to_add=None, shortcut_to_delete=None):
-        """Update shortcut file with new shortcuts"""
-        pass
-
     def create_shortcut_table(self):
-        """Creates table to view all shortcuts upon launch"""
-        pass
+        self.shortcut_table.setRowCount(0)
+        for shortcut in self.__shortcuts.get_shortcuts().values():
+            row_pos = self.shortcut_table.rowCount()
+            self.shortcut_table.insertRow(row_pos)
+            self.shortcut_table.setItem(
+                row_pos, 0, QtWidgets.QTableWidgetItem(shortcut.name)
+            )
+            self.shortcut_table.setItem(
+                row_pos,
+                1,
+                QtWidgets.QTableWidgetItem(shortcut.readable_key_sequence()),
+            )
+            self.shortcut_table.setItem(
+                row_pos,
+                2,
+                QtWidgets.QTableWidgetItem(command_id_to_name[shortcut.command]),
+            )
+            self.shortcut_table.setItem(
+                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut.description)
+            )
+        self.shortcut_table.resizeColumnsToContents()
 
     def update_shortcut_table(self, shortcut_to_add=None, shortcut_to_delete=None):
         if shortcut_to_add:
@@ -93,9 +85,7 @@ class MainWindow(QtWidgets.QListWidget):
             self.shortcut_table.setItem(
                 row_pos,
                 1,
-                QtWidgets.QTableWidgetItem(
-                    QKeySequence(shortcut_to_add.combination).toString()
-                ),
+                QtWidgets.QTableWidgetItem(shortcut_to_add.readable_key_sequence()),
             )
             self.shortcut_table.setItem(
                 row_pos,
@@ -106,17 +96,15 @@ class MainWindow(QtWidgets.QListWidget):
                 row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description)
             )
         if shortcut_to_delete:
-            pass
+            self.create_shortcut_table()
 
         self.shortcut_table.resizeColumnsToContents()
 
     def open_create_shortcut_window(self):
-        create_shortcut_window = CreateShortcutDialog(self.shortcut_data, parent=self)
+        create_shortcut_window = CreateShortcutDialog(parent=self)
         create_shortcut_window.resize(600, 400)
         result = create_shortcut_window.exec()
         if result == QtWidgets.QDialog.Accepted:
             shortcut = create_shortcut_window.get_data()
-            self.shortcut_data[shortcut.name] = shortcut
             self.update_shortcut_table(shortcut_to_add=shortcut)
-            self.update_shortcut_file(shortcut_to_add=shortcut)
-            print(shortcut)
+            self.__shortcuts.update_shortcuts_file(shortcut_to_add=shortcut)

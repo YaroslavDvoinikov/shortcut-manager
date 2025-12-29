@@ -6,18 +6,17 @@ from PySide6.QtCore import QFile, QTextStream
 
 from src.mainwindow import MainWindow
 from src.settings import Settings
+from src.theme import reload_theme, set_app
 
 os.environ.pop("QT_STYLE_OVERRIDE", None)
 os.environ["QT_LOGGING_RULES"] = "qt.qpa.wayland.textinput=false"
 
+
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    settings = Settings()
-    theme = settings.get_setting('theme')
-    file = QFile(theme + '.qss')
-    file.open(QFile.ReadOnly | QFile.Text)
-    stream = QTextStream(file)
-    app.setStyleSheet(stream.readAll())
+    set_app(app)
+    reload_theme()
     widget = MainWindow()
     widget.resize(800, 600)
     widget.show()
