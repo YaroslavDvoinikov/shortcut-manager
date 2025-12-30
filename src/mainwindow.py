@@ -2,9 +2,10 @@ from PySide6 import QtWidgets
 from PySide6.QtGui import QKeySequence
 
 from src.createshortcutdialog import CreateShortcutDialog
+from src.global_listener import GlobalListener
 from src.settingsdialog import SettingsDialog
-from src.shortcut import Shortcut
-from src.shortcuts import Shortcuts, command_id_to_name
+from src.shortcut import Shortcut, command_id_to_class
+from src.shortcuts import Shortcuts
 
 
 class MainWindow(QtWidgets.QListWidget):
@@ -63,12 +64,14 @@ class MainWindow(QtWidgets.QListWidget):
             self.shortcut_table.setItem(
                 row_pos,
                 1,
-                QtWidgets.QTableWidgetItem(shortcut.readable_key_sequence()),
+                QtWidgets.QTableWidgetItem(shortcut.combination),
             )
             self.shortcut_table.setItem(
                 row_pos,
                 2,
-                QtWidgets.QTableWidgetItem(command_id_to_name[shortcut.command]),
+                QtWidgets.QTableWidgetItem(
+                    command_id_to_class[shortcut.command].info()
+                ),
             )
             self.shortcut_table.setItem(
                 row_pos, 3, QtWidgets.QTableWidgetItem(shortcut.description)
@@ -85,12 +88,14 @@ class MainWindow(QtWidgets.QListWidget):
             self.shortcut_table.setItem(
                 row_pos,
                 1,
-                QtWidgets.QTableWidgetItem(shortcut_to_add.readable_key_sequence()),
+                QtWidgets.QTableWidgetItem(shortcut_to_add.combination),
             )
             self.shortcut_table.setItem(
                 row_pos,
                 2,
-                QtWidgets.QTableWidgetItem(command_id_to_name[shortcut_to_add.command]),
+                QtWidgets.QTableWidgetItem(
+                    command_id_to_class[shortcut_to_add.command].info()
+                ),
             )
             self.shortcut_table.setItem(
                 row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description)
@@ -108,3 +113,4 @@ class MainWindow(QtWidgets.QListWidget):
             shortcut = create_shortcut_window.get_data()
             self.update_shortcut_table(shortcut_to_add=shortcut)
             self.__shortcuts.update_shortcuts_file(shortcut_to_add=shortcut)
+            GlobalListener().reload_shortcuts()

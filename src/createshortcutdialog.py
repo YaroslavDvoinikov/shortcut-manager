@@ -1,35 +1,57 @@
 from imaplib import Commands
+from threading import Thread
 
+from pynput import keyboard
+from pynput.keyboard import Key, KeyCode
 from PySide6 import QtWidgets
 from PySide6.QtCore import QEvent, QKeyCombination, QObject
 from PySide6.QtGui import QKeySequence, Qt
 
+from src.key_normalize import format_keys, normalize_key
 from src.shortcut import Shortcut
 from src.shortcuts import Shortcuts
 
 
-# Key listener class
 class KeyPressFilter(QObject):
-    MODIFIER_KEYS = {
-        Qt.Key_Control,
-        Qt.Key_Shift,
-        Qt.Key_Alt,
-        Qt.Key_Meta,
-    }
+    def __init__(self, widget, parent=None):
+        super().__init__(parent)
+        self.current_keys = set()
+        self.widget = widget
+        self.is_active = True
 
-    def eventFilter(self, widget, event):
-        # To avoid showing only modifier keys pressed
-        if event.type() == QEvent.KeyPress:
-            if event.key() in self.MODIFIER_KEYS:
-                return True
+        self.listener = keyboard.Listener(
+            on_press=self.on_press_pynput, on_release=self.on_release_pynput
+        )
+        self.listener_thread = Thread(target=self.listener.run, daemon=True)
+        self.listener_thread.start()
 
-            combo = event.keyCombination()
-            text = QKeySequence(combo).toString()
+    def on_press_pynput(self, key):
+        if not self.is_active:
+            return
+        self.current_keys.add(key)
+        self.update_ui()
 
-            widget.key_sequence_input.setText(text)
-            widget.key_combination = combo
-            return True
-        return False
+    def on_release_pynput(self, key):
+        if key in self.current_keys:
+            self.current_keys.discard(key)
+        self.update_ui()
+
+    def update_ui(self):
+        if not self.is_active:
+            return
+        try:
+            text = format_keys(self.current_keys)
+            self.widget.setText(text)
+        except RuntimeError:
+            self.stop()
+
+    def get_current_keys(self):
+        return frozenset(self.current_keys)
+
+    def stop(self):
+        self.is_active = False
+        if self.listener:
+            self.listener.stop()
 
 
 class KeyCombinationDialog(QtWidgets.QDialog):
@@ -38,7 +60,7 @@ class KeyCombinationDialog(QtWidgets.QDialog):
 
         self.setWindowTitle("Press a key combination")
         self.key_combination = None
-
+        self.text = None
         self.key_sequence_label = QtWidgets.QLabel("Press a key combination:")
         self.key_sequence_label.setAlignment(Qt.AlignCenter)
 
@@ -55,10 +77,11 @@ class KeyCombinationDialog(QtWidgets.QDialog):
         layout.addWidget(self.key_sequence_save_button)
         self.setLayout(layout)
 
-        self.eventFilter = KeyPressFilter(parent=self)
-        self.installEventFilter(self.eventFilter)
+        self.eventFilter = KeyPressFilter(self.key_sequence_input, parent=self)
 
     def save_key_combination(self):
+        self.text = self.key_sequence_input.text()
+        self.key_combination = self.eventFilter.get_current_keys()
         if self.key_combination:
             self.accept()
         else:
@@ -66,6 +89,21 @@ class KeyCombinationDialog(QtWidgets.QDialog):
 
     def get_key_combination(self):
         return self.key_combination
+
+    def get_text(self):
+        return self.text
+
+    def closeEvent(self, event):
+        self.eventFilter.stop()
+        super().closeEvent(event)
+
+    def accept(self):
+        self.eventFilter.stop()
+        super().accept()
+
+    def reject(self):
+        self.eventFilter.stop()
+        super().reject()
 
 
 class CreateShortcutDialog(QtWidgets.QDialog):
@@ -158,8 +196,9 @@ class CreateShortcutDialog(QtWidgets.QDialog):
             self.error_label.setText("Key combination must be selected!")
             return
         else:
+            temp_combo = format_keys(self.key_combination)
             for shortcut in Shortcuts().get_shortcuts().values():
-                if shortcut.combination == self.key_combination.toCombined():
+                if shortcut.combination == temp_combo:
                     self.error_label.setText(
                         "Shortcut with this key combination already exists!"
                     )
@@ -179,12 +218,12 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         result = create_shortcut_window.exec()
         if result == QtWidgets.QDialog.Accepted:
             self.key_combination = create_shortcut_window.get_key_combination()
-            text = QKeySequence(self.key_combination).toString()
+            text = create_shortcut_window.get_text()
             self.combination_input_button.setText(text)
 
     def get_data(self) -> Shortcut:
         name = self.name_input.text().strip()
-        key_combination = self.key_combination.toCombined()
+        key_combination = format_keys(self.key_combination)
         selected_command = self.selected_command
         description = self.description_input.text().strip()
         return Shortcut([name, key_combination, selected_command, description])

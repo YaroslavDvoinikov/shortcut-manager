@@ -4,13 +4,13 @@ import sys
 from PySide6 import QtWidgets
 from PySide6.QtCore import QFile, QTextStream
 
+from src.global_listener import GlobalListener
 from src.mainwindow import MainWindow
 from src.settings import Settings
 from src.theme import reload_theme, set_app
 
 os.environ.pop("QT_STYLE_OVERRIDE", None)
 os.environ["QT_LOGGING_RULES"] = "qt.qpa.wayland.textinput=false"
-
 
 
 if __name__ == "__main__":
@@ -20,4 +20,5 @@ if __name__ == "__main__":
     widget = MainWindow()
     widget.resize(800, 600)
     widget.show()
+    global_listener = GlobalListener()
     sys.exit(app.exec())

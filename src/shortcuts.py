@@ -3,8 +3,6 @@ import os
 
 from src.shortcut import Shortcut
 
-command_id_to_name = {0: "Run an executable", 1: "Take screenshot"}
-
 
 class Shortcuts:
     def __new__(cls):
@@ -34,7 +32,7 @@ class Shortcuts:
             self.__shortcuts[shortcut_to_add.combination] = shortcut_to_add
         if shortcut_to_remove:
             del self.__shortcuts[shortcut_to_remove.combination]
-        with open("shortcuts.csv", "w") as file:
+        with open("shortcuts.csv", "w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             for shortcut in self.__shortcuts.values():
                 writer.writerow(
