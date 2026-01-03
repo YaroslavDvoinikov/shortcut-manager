@@ -6,6 +6,7 @@ from pynput.keyboard import Key, KeyCode
 from PySide6 import QtWidgets
 from PySide6.QtCore import QEvent, QKeyCombination, QObject
 from PySide6.QtGui import QKeySequence, Qt
+from PySide6.QtWidgets import QFileDialog
 
 from src.key_normalize import format_keys, normalize_key
 from src.shortcut import Shortcut
@@ -114,6 +115,8 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.setWindowTitle("Create Shortcut")
         self.selected_command = None
         self.key_combination = None
+        self.optional_arguments = []
+        self.can_accept = True
 
         # Name input
         self.name_title = QtWidgets.QLabel("Name of a shortcut:")
@@ -184,6 +187,12 @@ class CreateShortcutDialog(QtWidgets.QDialog):
     def validate(self):
         name = self.name_input.text().strip()
 
+        if not self.can_accept:
+            self.error_label.setText(
+                "Missing required parameters for selected command!"
+            )
+            return
+
         if not name:
             self.error_label.setText("Name must be filled!")
             return
@@ -211,7 +220,28 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.accept()
 
     def on_command_selected(self, button):
+        # Switch case to all selected commands, to get optional arguments
+        self.optional_arguments.clear()
         self.selected_command = self.command_button_group.id(button)
+        match self.selected_command:
+            case 0:
+                file = QFileDialog.getOpenFileName(self, caption="Choose an executable")
+                if file[0] != "":
+                    self.optional_arguments.append(file[0])
+                    self.can_accept = True
+                    self.run_executable_btn.setText(file[0])
+                else:
+                    self.can_accept = False
+                    self.run_executable_btn.setText("Run an executable")
+            case 1:
+                dir = QFileDialog.getExistingDirectory(
+                    self, caption="Choose a directory where to save the screenshots"
+                )
+                if dir != "":
+                    self.optional_arguments.append(dir)
+                    self.can_accept = True
+                else:
+                    self.can_accept = False
 
     def open_key_combination_dialog(self):
         create_shortcut_window = KeyCombinationDialog(self)
@@ -226,4 +256,12 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         key_combination = format_keys(self.key_combination)
         selected_command = self.selected_command
         description = self.description_input.text().strip()
-        return Shortcut([name, key_combination, selected_command, description])
+        return Shortcut(
+            [
+                name,
+                key_combination,
+                selected_command,
+                description,
+                self.optional_arguments,
+            ]
+        )

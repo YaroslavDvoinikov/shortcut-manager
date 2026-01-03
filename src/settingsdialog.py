@@ -1,8 +1,12 @@
+from ast import Global
+
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog
 
+from src.global_listener import GlobalListener
 from src.settings import Settings
+from src.shortcuts import Shortcuts
 from src.theme import reload_theme
 
 
@@ -10,6 +14,8 @@ class SettingsDialog(QtWidgets.QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.__settings = Settings()
+        self.__shortcuts = Shortcuts()
+        self.__parent = parent
 
         self.setWindowTitle("Settings")
 
@@ -73,8 +79,41 @@ class SettingsDialog(QtWidgets.QDialog):
 
         self.export_settings_button.clicked.connect(on_click_export_settings)
 
+        self.import_shortcuts_button = QtWidgets.QPushButton("Import Shortcuts")
+
+        def on_click_import_shortcuts():
+            file = QFileDialog.getOpenFileName(
+                self, caption="Import Shortcuts", filter="Shortcut Files (*.csv)"
+            )
+            if file[0] != "":
+                self.__shortcuts.replace_shortcuts_file(file[0])
+                self.__parent.create_shortcut_table()
+                GlobalListener().reload_shortcuts()
+
+        self.import_shortcuts_button.clicked.connect(on_click_import_shortcuts)
+
+        self.export_shortcuts_button = QtWidgets.QPushButton("Export Shortcuts")
+
+        def on_click_export_shortcuts():
+            file = QFileDialog.getSaveFileName(
+                self, caption="Export Shortcuts", filter="Shortcut Files (*.csv)"
+            )
+            print(file)
+            if file[0] != "":
+                self.__shortcuts.save_shortcuts_file(file[0])
+
+        self.export_shortcuts_button.clicked.connect(on_click_export_shortcuts)
+
+        settings_layout = QtWidgets.QHBoxLayout()
+        settings_layout.addWidget(self.import_settings_button)
+        settings_layout.addWidget(self.export_settings_button)
+
+        shortcuts_layout = QtWidgets.QHBoxLayout()
+        shortcuts_layout.addWidget(self.import_shortcuts_button)
+        shortcuts_layout.addWidget(self.export_shortcuts_button)
+
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.addWidget(self.theme_label)
         main_layout.addWidget(self.theme_group)
-        main_layout.addWidget(self.import_settings_button)
-        main_layout.addWidget(self.export_settings_button)
+        main_layout.addLayout(settings_layout)
+        main_layout.addLayout(shortcuts_layout)

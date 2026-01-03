@@ -1,3 +1,5 @@
+import json
+
 from PySide6.QtCore import QKeyCombination
 from PySide6.QtGui import QKeySequence
 
@@ -14,15 +16,20 @@ class Shortcut:
         self.combination = data[1]  # string received using format_keys
         self.command = int(data[2])  # integer
         self.description = data[3]  # string
-        self.optional_arguments = []
+        raw_args = data[4]
+        # When we receive data from GUI it already a list, if it is from csv file, it a json string
+        if isinstance(raw_args, str):
+            self.optional_arguments = json.loads(raw_args)
+        else:
+            self.optional_arguments = list(raw_args)
 
     def readable_key_sequence(self):
         return format_keys(self.combination)
 
     def __str__(self):
-        return f"\n Name: {self.name}\n Combination: {self.combination}\n Command: {self.command}\n Description: {self.description}\n"
+        return f"\n Name: {self.name}\n Combination: {self.combination}\n Command: {self.command}\n Description: {self.description} Optional Arguments: {self.optional_arguments}\n"
 
     def action(self):
         command_class = command_id_to_class[self.command]
         command_instance = command_class()
-        command_instance.action(self.optional_arguments)
+        command_instance.action(*self.optional_arguments)

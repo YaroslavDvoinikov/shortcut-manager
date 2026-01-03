@@ -12,7 +12,6 @@ class MainWindow(QtWidgets.QListWidget):
     def __init__(self):
         super().__init__()
         self.__shortcuts = Shortcuts()
-
         self.setWindowTitle("Shortcut Manager")
 
         self.open_settings_button = QtWidgets.QPushButton("Settings")
@@ -44,14 +43,6 @@ class MainWindow(QtWidgets.QListWidget):
     def open_settings(self):
         settings = SettingsDialog(self)
         settings.exec()
-
-    def import_shortcuts(self):
-        """Import shortcuts from a file, changes content of default shortcuts file"""
-        pass
-
-    def export_shortcuts(self):
-        """Export shortcuts from default settings file to a created or existing file"""
-        pass
 
     def create_shortcut_table(self):
         self.shortcut_table.setRowCount(0)

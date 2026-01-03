@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 
 from src.shortcut import Shortcut
@@ -19,8 +20,33 @@ class Shortcuts:
             with open("shortcuts.csv", "r") as file:
                 reader = csv.reader(file)
                 for line in reader:
+                    line[4] = json.loads(line[4])
                     shortcut = Shortcut(line)
                     self.__shortcuts[shortcut.combination] = shortcut
+
+    def replace_shortcuts_file(self, path: str):
+        self.__shortcuts.clear()
+        with open(path, "r") as file:
+            reader = csv.reader(file)
+            for line in reader:
+                line[4] = json.loads(line[4])
+                shortcut = Shortcut(line)
+                self.__shortcuts[shortcut.combination] = shortcut
+        self.update_shortcuts_file()
+
+    def save_shortcuts_file(self, path: str):
+        with open(path, "w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            for shortcut in self.__shortcuts.values():
+                writer.writerow(
+                    [
+                        shortcut.name,
+                        shortcut.combination,
+                        shortcut.command,
+                        shortcut.description,
+                        json.dumps(shortcut.optional_arguments, ensure_ascii=False),
+                    ]
+                )
 
     def get_shortcuts(
         self,
@@ -41,6 +67,7 @@ class Shortcuts:
                         shortcut.combination,
                         shortcut.command,
                         shortcut.description,
+                        json.dumps(shortcut.optional_arguments, ensure_ascii=False),
                     ]
                 )
 
