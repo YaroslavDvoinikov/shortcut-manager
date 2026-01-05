@@ -2,11 +2,9 @@ import os
 import sys
 
 from PySide6 import QtWidgets
-from PySide6.QtCore import QFile, QTextStream
 
-from src.global_listener import GlobalListener
+from src.globallistener import GlobalListener
 from src.mainwindow import MainWindow
-from src.settings import Settings
 from src.theme import reload_theme, set_app
 
 os.environ.pop("QT_STYLE_OVERRIDE", None)

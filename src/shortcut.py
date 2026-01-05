@@ -1,11 +1,8 @@
 import json
 
-from PySide6.QtCore import QKeyCombination
-from PySide6.QtGui import QKeySequence
-
-from src.key_normalize import format_keys, normalize_key
-from src.run_an_executable import RunAnExecutable
-from src.screenshot_taker import ScreenshotTaker
+from src.keynormalize import format_keys, normalize_key
+from src.runexecutable import RunAnExecutable
+from src.screenshottaker import ScreenshotTaker
 
 command_id_to_class = {0: RunAnExecutable, 1: ScreenshotTaker}
 
