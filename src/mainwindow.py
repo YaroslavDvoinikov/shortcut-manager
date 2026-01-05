@@ -1,10 +1,9 @@
 from PySide6 import QtWidgets
-from PySide6.QtGui import QKeySequence
 
 from src.createshortcutdialog import CreateShortcutDialog
-from src.global_listener import GlobalListener
+from src.globallistener import GlobalListener
 from src.settingsdialog import SettingsDialog
-from src.shortcut import Shortcut, command_id_to_class
+from src.shortcut import command_id_to_class
 from src.shortcuts import Shortcuts
 
 

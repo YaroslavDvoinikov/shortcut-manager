@@ -1,10 +1,8 @@
-from ast import Global
-
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog
 
-from src.global_listener import GlobalListener
+from src.globallistener import GlobalListener
 from src.settings import Settings
 from src.shortcuts import Shortcuts
 from src.theme import reload_theme

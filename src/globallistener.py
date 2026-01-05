@@ -1,9 +1,8 @@
-import time
 from threading import Thread
 
 from pynput import keyboard
 
-from src.key_normalize import format_keys
+from src.keynormalize import format_keys
 from src.shortcuts import Shortcuts
 
 shortcut_list = Shortcuts().get_shortcuts()

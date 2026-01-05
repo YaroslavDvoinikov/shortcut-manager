@@ -1,14 +1,12 @@
-from imaplib import Commands
 from threading import Thread
 
 from pynput import keyboard
-from pynput.keyboard import Key, KeyCode
 from PySide6 import QtWidgets
-from PySide6.QtCore import QEvent, QKeyCombination, QObject
-from PySide6.QtGui import QKeySequence, Qt
+from PySide6.QtCore import QObject
+from PySide6.QtGui import Qt
 from PySide6.QtWidgets import QFileDialog
 
-from src.key_normalize import format_keys, normalize_key
+from src.keynormalize import format_keys
 from src.shortcut import Shortcut
 from src.shortcuts import Shortcuts
 
