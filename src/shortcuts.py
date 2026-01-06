@@ -51,3 +51,6 @@ class Shortcuts:
 
     def remove(self, combination):
         del self.__shortcuts[combination]
+
+    def update(self, combination, shortcut: Shortcut):
+        self.__shortcuts[combination] = shortcut
