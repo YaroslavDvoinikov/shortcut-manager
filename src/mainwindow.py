@@ -1,11 +1,11 @@
 from PySide6 import QtWidgets
 
+from src.actions import info
 from src.createshortcutdialog import CreateShortcutDialog
 from src.globallistener import GlobalListener
 from src.settingsdialog import SettingsDialog
-from src.actions import info
-from src.shortcuts import Shortcuts
 from src.shortcutdialog import ShortcutDialog
+from src.shortcuts import Shortcuts
 
 
 class MainWindow(QtWidgets.QListWidget):
@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QListWidget):
         combination = self.shortcut_table.item(row, 1).text()
 
         dialog = ShortcutDialog(self, combination)
-        dialog.resize(600, 400)
+        dialog.resize(400, 200)
         result = dialog.exec()
         if result == QtWidgets.QDialog.Accepted:
             self.create_shortcut_table()
@@ -59,20 +59,36 @@ class MainWindow(QtWidgets.QListWidget):
         for shortcut in self.__shortcuts.get_shortcuts().values():
             row_pos = self.shortcut_table.rowCount()
             self.shortcut_table.insertRow(row_pos)
-            self.shortcut_table.setItem(row_pos, 0, QtWidgets.QTableWidgetItem(shortcut.name))
-            self.shortcut_table.setItem(row_pos, 1,QtWidgets.QTableWidgetItem(shortcut.combination))
-            self.shortcut_table.setItem(row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut.command)))
-            self.shortcut_table.setItem(row_pos, 3, QtWidgets.QTableWidgetItem(shortcut.description))
+            self.shortcut_table.setItem(
+                row_pos, 0, QtWidgets.QTableWidgetItem(shortcut.name)
+            )
+            self.shortcut_table.setItem(
+                row_pos, 1, QtWidgets.QTableWidgetItem(shortcut.combination)
+            )
+            self.shortcut_table.setItem(
+                row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut.command))
+            )
+            self.shortcut_table.setItem(
+                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut.description)
+            )
         self.shortcut_table.resizeColumnsToContents()
 
     def update_shortcut_table(self, shortcut_to_add=None, shortcut_to_delete=None):
         if shortcut_to_add:
             row_pos = self.shortcut_table.rowCount()
             self.shortcut_table.insertRow(row_pos)
-            self.shortcut_table.setItem(row_pos, 0, QtWidgets.QTableWidgetItem(shortcut_to_add.name))
-            self.shortcut_table.setItem(row_pos, 1, QtWidgets.QTableWidgetItem(shortcut_to_add.combination))
-            self.shortcut_table.setItem(row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut_to_add.command)))
-            self.shortcut_table.setItem(row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description))
+            self.shortcut_table.setItem(
+                row_pos, 0, QtWidgets.QTableWidgetItem(shortcut_to_add.name)
+            )
+            self.shortcut_table.setItem(
+                row_pos, 1, QtWidgets.QTableWidgetItem(shortcut_to_add.combination)
+            )
+            self.shortcut_table.setItem(
+                row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut_to_add.command))
+            )
+            self.shortcut_table.setItem(
+                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description)
+            )
         if shortcut_to_delete:
             self.create_shortcut_table()
 

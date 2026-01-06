@@ -21,9 +21,11 @@ class ShortcutDialog(QtWidgets.QDialog):
 
         self.delete_button = QtWidgets.QPushButton("Delete")
         self.delete_button.clicked.connect(self.delete_shortcut)
+        self.delete_button.setStyleSheet("color: red;")
 
         self.save_button = QtWidgets.QPushButton("Save")
         self.save_button.clicked.connect(self.close_dialog)
+        self.save_button.setStyleSheet("color: green;")
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -31,8 +33,8 @@ class ShortcutDialog(QtWidgets.QDialog):
         main_layout.addWidget(self.name_input)
         main_layout.addWidget(self.description_title)
         main_layout.addWidget(self.description_input)
-        main_layout.addWidget(self.delete_button)
         main_layout.addWidget(self.save_button)
+        main_layout.addWidget(self.delete_button)
 
     def delete_shortcut(self):
         self.__shortcuts.remove(self.__shortcut.combination)
