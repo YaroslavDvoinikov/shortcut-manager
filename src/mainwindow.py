@@ -5,6 +5,7 @@ from src.globallistener import GlobalListener
 from src.settingsdialog import SettingsDialog
 from src.actions import info
 from src.shortcuts import Shortcuts
+from src.shortcutdialog import ShortcutDialog
 
 
 class MainWindow(QtWidgets.QListWidget):
@@ -20,6 +21,7 @@ class MainWindow(QtWidgets.QListWidget):
 
         # Table with shortcuts
         self.shortcut_table = QtWidgets.QTableWidget()
+        self.shortcut_table.cellDoubleClicked.connect(self.open_shortcut_dialog)
         self.shortcut_table.setColumnCount(4)
         self.shortcut_table.setHorizontalHeaderLabels(
             ["Name", "Combination", "Action", "Description"]
@@ -38,6 +40,15 @@ class MainWindow(QtWidgets.QListWidget):
         main_layout.addWidget(self.shortcut_table)
 
         self.create_shortcut_table()
+
+    def open_shortcut_dialog(self, row, column):
+        combination = self.shortcut_table.item(row, 1).text()
+
+        dialog = ShortcutDialog(self, combination)
+        dialog.resize(600, 400)
+        result = dialog.exec()
+        if result == QtWidgets.QDialog.Accepted:
+            self.create_shortcut_table()
 
     def open_settings(self):
         settings = SettingsDialog(self)
