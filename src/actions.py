@@ -22,11 +22,13 @@ def action(command: int, arg):
             )
             sct.shot(output=str(filename))
     elif command == 2:
+        dir_path = Path(arg)
         now = datetime.now()
-        arg = arg[2:-2] + '/'
-        filename = arg + f"Video-{now.year}-{now.month:02d}-{now.day:02d}-{now.hour:02d}{now.minute:02d}{now.second:02d}.mp4"
-        print(filename)
-        recorder.start_recording(filename,30,{
+        filename = (
+                dir_path
+                / f"Video-{now.year}-{now.month:02d}-{now.day:02d}-{now.hour:02d}{now.minute:02d}{now.second:02d}.mp4"
+        )
+        recorder.start_recording(str(filename),30,{
             "mon": 1,
             "left": 100,
             "top": 100,
