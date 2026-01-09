@@ -175,11 +175,6 @@ class CreateShortcutDialog(QtWidgets.QDialog):
 
         self.command_button_group.buttonClicked.connect(self.on_command_selected)
 
-        # Description input
-        self.description_title = QtWidgets.QLabel("Description of a shortcut:")
-        self.description_input = QtWidgets.QLineEdit()
-        self.description_input.setPlaceholderText("Enter description")
-
         # Error label
         self.error_label = QtWidgets.QLabel("")
         self.error_label.setStyleSheet("color: red;")
@@ -206,8 +201,6 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         main_layout.addWidget(self.combination_input_button)
         main_layout.addWidget(self.command_title)
         main_layout.addLayout(command_buttons_layout)
-        main_layout.addWidget(self.description_title)
-        main_layout.addWidget(self.description_input)
         main_layout.addStretch()
         main_layout.addWidget(self.error_label)
         main_layout.addWidget(self.create_button)
@@ -307,14 +300,12 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         name = self.name_input.text().strip()
         key_combination = format_keys(self.key_combination)
         selected_command = self.selected_command
-        description = self.description_input.text().strip()
         if len(self.optional_arguments) != 0:
             return Shortcut(
                 [
                     name,
                     key_combination,
                     selected_command,
-                    description,
                     self.optional_arguments,
                 ]
             )
@@ -324,7 +315,6 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                     name,
                     key_combination,
                     selected_command,
-                    description,
                     [],
                 ]
             )

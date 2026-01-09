@@ -22,9 +22,9 @@ class MainWindow(QtWidgets.QListWidget):
         # Table with shortcuts
         self.shortcut_table = QtWidgets.QTableWidget()
         self.shortcut_table.cellDoubleClicked.connect(self.open_shortcut_dialog)
-        self.shortcut_table.setColumnCount(4)
+        self.shortcut_table.setColumnCount(3)
         self.shortcut_table.setHorizontalHeaderLabels(
-            ["Name", "Combination", "Action", "Description"]
+            ["Name", "Combination", "Action"]
         )
         self.shortcut_table.resizeColumnsToContents()
         self.shortcut_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -68,9 +68,6 @@ class MainWindow(QtWidgets.QListWidget):
             self.shortcut_table.setItem(
                 row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut.command))
             )
-            self.shortcut_table.setItem(
-                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut.description)
-            )
         self.shortcut_table.resizeColumnsToContents()
 
     def update_shortcut_table(self, shortcut_to_add=None, shortcut_to_delete=None):
@@ -85,9 +82,6 @@ class MainWindow(QtWidgets.QListWidget):
             )
             self.shortcut_table.setItem(
                 row_pos, 2, QtWidgets.QTableWidgetItem(info(shortcut_to_add.command))
-            )
-            self.shortcut_table.setItem(
-                row_pos, 3, QtWidgets.QTableWidgetItem(shortcut_to_add.description)
             )
         if shortcut_to_delete:
             self.create_shortcut_table()
