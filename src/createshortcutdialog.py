@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QFileDialog
 from src.keynormalize import format_keys
 from src.shortcut import Shortcut
 from src.shortcuts import Shortcuts
+from src.theme import get_app
 
 
 class KeyPressFilter(QObject):
@@ -143,19 +144,14 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.screenshot_btn.setCheckable(True)
         self.screenshot_btn.setMaximumWidth(200)
 
-        self.start_screen_record_bth = QtWidgets.QPushButton("Start screen record")
+        self.start_screen_record_bth = QtWidgets.QPushButton("Start screen recording")
         self.start_screen_record_bth.setCheckable(True)
         self.start_screen_record_bth.setMaximumWidth(200)
-
-        self.stop_screen_record_bth = QtWidgets.QPushButton("Stop screen record")
-        self.stop_screen_record_bth.setCheckable(True)
-        self.stop_screen_record_bth.setMaximumWidth(200)
 
         # Add Future buttons HERE ------------------------------------------------------------
         self.command_button_group.addButton(self.run_executable_btn, 0)
         self.command_button_group.addButton(self.screenshot_btn, 1)
         self.command_button_group.addButton(self.start_screen_record_bth, 2)
-        self.command_button_group.addButton(self.stop_screen_record_bth, 3)
 
         self.command_button_group.buttonClicked.connect(self.on_command_selected)
 
@@ -177,7 +173,6 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         command_buttons_layout.addWidget(self.run_executable_btn, 0, 0)
         command_buttons_layout.addWidget(self.screenshot_btn, 0, 1)
         command_buttons_layout.addWidget(self.start_screen_record_bth, 0, 2)
-        command_buttons_layout.addWidget(self.stop_screen_record_bth, 0, 3)
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -259,9 +254,11 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                 if dir != "":
                     self.optional_arguments.append(dir)
                     self.can_accept = True
+                    width, height = get_app().primaryScreen().size().toTuple()
+                    self.optional_arguments.append(width)
+                    self.optional_arguments.append(height)
                 else:
                     self.can_accept = False
-
 
     def open_key_combination_dialog(self):
         create_shortcut_window = KeyCombinationDialog(self)
@@ -283,7 +280,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                     key_combination,
                     selected_command,
                     description,
-                    self.optional_arguments[0],
+                    self.optional_arguments,
                 ]
             )
         else:

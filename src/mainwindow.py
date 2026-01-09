@@ -100,7 +100,6 @@ class MainWindow(QtWidgets.QListWidget):
         result = create_shortcut_window.exec()
         if result == QtWidgets.QDialog.Accepted:
             shortcut = create_shortcut_window.get_data()
-            shortcut.optional_argument = shortcut.optional_argument
             self.__shortcuts.add(shortcut)
             self.__shortcuts.save_shortcuts_file("shortcuts.csv")
             self.update_shortcut_table(shortcut_to_add=shortcut)

@@ -10,6 +10,11 @@ def set_app(qapp):
     app = qapp
 
 
+def get_app():
+    global app
+    return app
+
+
 def reload_theme():
     if app is None:
         print("QApplication not set for theme")
