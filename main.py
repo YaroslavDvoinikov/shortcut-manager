@@ -14,7 +14,7 @@ os.environ["QT_LOGGING_RULES"] = "qt.qpa.wayland.textinput=false"
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    app.lastWindowClosed.connect(stop_recording)
+    app.setQuitOnLastWindowClosed(False)
     set_app(app)
     reload_theme()
     widget = MainWindow()

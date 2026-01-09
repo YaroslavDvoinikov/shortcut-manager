@@ -1,10 +1,9 @@
 from threading import Thread
 
-from PyQt6.QtGui import QGuiApplication
 from pynput import keyboard
 from PySide6 import QtWidgets
 from PySide6.QtCore import QObject
-from PySide6.QtGui import Qt
+from PySide6.QtGui import QGuiApplication, Qt
 from PySide6.QtWidgets import QFileDialog
 
 from src.keynormalize import format_keys

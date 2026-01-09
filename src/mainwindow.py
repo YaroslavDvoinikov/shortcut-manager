@@ -1,6 +1,8 @@
 from PySide6 import QtWidgets
+from PySide6.QtGui import QAction, QIcon
+from PySide6.QtWidgets import QMenu, QSystemTrayIcon
 
-from src.actions import info
+from src.actions import info, stop_recording
 from src.createshortcutdialog import CreateShortcutDialog
 from src.globallistener import GlobalListener
 from src.settingsdialog import SettingsDialog
@@ -14,6 +16,26 @@ class MainWindow(QtWidgets.QListWidget):
         self.__shortcuts = Shortcuts()
         self.setWindowTitle("Shortcut Manager")
 
+        # App tray
+        self.tray = QSystemTrayIcon(self)
+        self.tray.setIcon(QIcon("icon.png"))
+        self.tray.setToolTip("Shortcut Manager")
+
+        tray_menu = QMenu()
+
+        show_action = QAction("Show", self)
+        exit_action = QAction("Close", self)
+
+        show_action.triggered.connect(self.show_window)
+        exit_action.triggered.connect(self.exit_app)
+
+        tray_menu.addAction(show_action)
+        tray_menu.addAction(exit_action)
+
+        self.tray.setContextMenu(tray_menu)
+        self.tray.activated.connect(self.on_tray_activated)
+        self.tray.show()
+
         self.open_settings_button = QtWidgets.QPushButton("Settings")
         self.open_settings_button.clicked.connect(self.open_settings)
         self.create_new_shortcut = QtWidgets.QPushButton("Create shortcut")
@@ -23,9 +45,7 @@ class MainWindow(QtWidgets.QListWidget):
         self.shortcut_table = QtWidgets.QTableWidget()
         self.shortcut_table.cellDoubleClicked.connect(self.open_shortcut_dialog)
         self.shortcut_table.setColumnCount(3)
-        self.shortcut_table.setHorizontalHeaderLabels(
-            ["Name", "Combination", "Action"]
-        )
+        self.shortcut_table.setHorizontalHeaderLabels(["Name", "Combination", "Action"])
         self.shortcut_table.resizeColumnsToContents()
         self.shortcut_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
@@ -40,6 +60,28 @@ class MainWindow(QtWidgets.QListWidget):
         main_layout.addWidget(self.shortcut_table)
 
         self.create_shortcut_table()
+
+    # Rewriting virtual method, so the app is only hidden when the user clicks the close button
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
+
+    # Method for show button in trey
+    def show_window(self):
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
+    # Showing app window when tray icon is clicked
+    def on_tray_activated(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            self.show_window()
+
+    # Completely exiting the app when the user clicks the close button in tray
+    def exit_app(self):
+        self.tray.hide()
+        stop_recording()
+        QtWidgets.QApplication.quit()
 
     def open_shortcut_dialog(self, row, column):
         combination = self.shortcut_table.item(row, 1).text()
