@@ -8,9 +8,8 @@ class Shortcut:
         self.name = data[0]
         self.combination = data[1]
         self.command = int(data[2])
-        self.description = data[3]
         self.optional_arguments = []
-        raw_args = data[4]
+        raw_args = data[3]
 
         # When we receive data from GUI it already a list, if it is from csv file, it a json string
         if isinstance(raw_args, str):
@@ -22,4 +21,4 @@ class Shortcut:
         action(self.command, *self.optional_arguments)
 
     def __str__(self):
-        return f"{self.name}, {self.combination}, {self.command}, {self.description}, {self.optional_arguments}"
+        return f"{self.name}, {self.combination}, {self.command}, {self.optional_arguments}"

@@ -19,7 +19,7 @@ class Shortcuts:
             with open("shortcuts.csv", "r") as file:
                 reader = csv.reader(file)
                 for line in reader:
-                    line[4] = json.loads(line[4])
+                    line[3] = json.loads(line[3])
                     shortcut = Shortcut(line)
                     self.__shortcuts[shortcut.combination] = shortcut
 
@@ -40,7 +40,6 @@ class Shortcuts:
                         shortcut.name,
                         shortcut.combination,
                         shortcut.command,
-                        shortcut.description,
                         json.dumps(shortcut.optional_arguments, ensure_ascii=False),
                     ]
                 )
