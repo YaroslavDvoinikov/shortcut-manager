@@ -1,4 +1,7 @@
+import os
 import subprocess
+import sys
+from calendar import c
 from datetime import datetime
 from pathlib import Path
 
@@ -43,10 +46,24 @@ def action(command: int, *args):
                         "height": args[2],
                     },
                 )
-
             else:
                 screen_record_started = False
                 recorder.stop_recording()
+        case 3:
+            if sys.platform == "linux":
+                subprocess.run(["shutdown", "now"])
+            elif sys.platform == "win32":
+                subprocess.run(["shutdown", "/s", "/t", "0"])
+        case 4:
+            if sys.platform == "linux":
+                subprocess.run(["reboot"])
+            elif sys.platform == "win32":
+                subprocess.run(["shutdown", "/r", "/t", "0"])
+        case 5:
+            if sys.platform == "linux":
+                os.system("pkill -KILL -u" + os.getlogin())
+            elif sys.platform == "win32":
+                subprocess.run(["shutdown", "/l", "/t", "0"])
 
 
 def info(command: int):

@@ -144,14 +144,29 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.screenshot_btn.setCheckable(True)
         self.screenshot_btn.setMaximumWidth(200)
 
-        self.start_screen_record_bth = QtWidgets.QPushButton("Start screen recording")
-        self.start_screen_record_bth.setCheckable(True)
-        self.start_screen_record_bth.setMaximumWidth(200)
+        self.start_screen_record_btn = QtWidgets.QPushButton("Start screen recording")
+        self.start_screen_record_btn.setCheckable(True)
+        self.start_screen_record_btn.setMaximumWidth(200)
+
+        self.power_off_btn = QtWidgets.QPushButton("Power off")
+        self.power_off_btn.setCheckable(True)
+        self.power_off_btn.setMaximumWidth(200)
+
+        self.reboot_btn = QtWidgets.QPushButton("Reboot")
+        self.reboot_btn.setCheckable(True)
+        self.reboot_btn.setMaximumWidth(200)
+
+        self.logout_btn = QtWidgets.QPushButton("Logout")
+        self.logout_btn.setCheckable(True)
+        self.logout_btn.setMaximumWidth(200)
 
         # Add Future buttons HERE ------------------------------------------------------------
         self.command_button_group.addButton(self.run_executable_btn, 0)
         self.command_button_group.addButton(self.screenshot_btn, 1)
-        self.command_button_group.addButton(self.start_screen_record_bth, 2)
+        self.command_button_group.addButton(self.start_screen_record_btn, 2)
+        self.command_button_group.addButton(self.power_off_btn, 3)
+        self.command_button_group.addButton(self.reboot_btn, 4)
+        self.command_button_group.addButton(self.logout_btn, 5)
 
         self.command_button_group.buttonClicked.connect(self.on_command_selected)
 
@@ -172,7 +187,10 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         command_buttons_layout = QtWidgets.QGridLayout()
         command_buttons_layout.addWidget(self.run_executable_btn, 0, 0)
         command_buttons_layout.addWidget(self.screenshot_btn, 0, 1)
-        command_buttons_layout.addWidget(self.start_screen_record_bth, 0, 2)
+        command_buttons_layout.addWidget(self.start_screen_record_btn, 0, 2)
+        command_buttons_layout.addWidget(self.power_off_btn, 1, 0)
+        command_buttons_layout.addWidget(self.reboot_btn, 1, 1)
+        command_buttons_layout.addWidget(self.logout_btn, 1, 2)
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -259,6 +277,8 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                     self.optional_arguments.append(height)
                 else:
                     self.can_accept = False
+            case _:
+                self.can_accept = True
 
     def open_key_combination_dialog(self):
         create_shortcut_window = KeyCombinationDialog(self)
