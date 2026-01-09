@@ -1,5 +1,6 @@
 from threading import Thread
 
+from PyQt6.QtGui import QGuiApplication
 from pynput import keyboard
 from PySide6 import QtWidgets
 from PySide6.QtCore import QObject
@@ -9,7 +10,6 @@ from PySide6.QtWidgets import QFileDialog
 from src.keynormalize import format_keys
 from src.shortcut import Shortcut
 from src.shortcuts import Shortcuts
-from src.theme import get_app
 
 
 class KeyPressFilter(QObject):
@@ -160,6 +160,10 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.logout_btn.setCheckable(True)
         self.logout_btn.setMaximumWidth(200)
 
+        self.start_audio_record_btn = QtWidgets.QPushButton("Start audio recording")
+        self.start_audio_record_btn.setCheckable(True)
+        self.start_audio_record_btn.setMaximumWidth(200)
+
         # Add Future buttons HERE ------------------------------------------------------------
         self.command_button_group.addButton(self.run_executable_btn, 0)
         self.command_button_group.addButton(self.screenshot_btn, 1)
@@ -167,6 +171,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         self.command_button_group.addButton(self.power_off_btn, 3)
         self.command_button_group.addButton(self.reboot_btn, 4)
         self.command_button_group.addButton(self.logout_btn, 5)
+        self.command_button_group.addButton(self.start_audio_record_btn, 6)
 
         self.command_button_group.buttonClicked.connect(self.on_command_selected)
 
@@ -191,6 +196,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         command_buttons_layout.addWidget(self.power_off_btn, 1, 0)
         command_buttons_layout.addWidget(self.reboot_btn, 1, 1)
         command_buttons_layout.addWidget(self.logout_btn, 1, 2)
+        command_buttons_layout.addWidget(self.start_audio_record_btn, 2, 0)
 
         main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -272,9 +278,18 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                 if dir != "":
                     self.optional_arguments.append(dir)
                     self.can_accept = True
-                    width, height = get_app().primaryScreen().size().toTuple()
+                    width, height = QGuiApplication.primaryScreen().size().toTuple()
                     self.optional_arguments.append(width)
                     self.optional_arguments.append(height)
+                else:
+                    self.can_accept = False
+            case 6:
+                dir = QFileDialog.getExistingDirectory(
+                    self, caption="Choose a directory where to save the screenshots"
+                )
+                if dir != "":
+                    self.optional_arguments.append(dir)
+                    self.can_accept = True
                 else:
                     self.can_accept = False
             case _:
