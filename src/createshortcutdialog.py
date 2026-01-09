@@ -276,12 +276,23 @@ class CreateShortcutDialog(QtWidgets.QDialog):
         key_combination = format_keys(self.key_combination)
         selected_command = self.selected_command
         description = self.description_input.text().strip()
-        return Shortcut(
-            [
-                name,
-                key_combination,
-                selected_command,
-                description,
-                self.optional_arguments,
-            ]
-        )
+        if len(self.optional_arguments) != 0:
+            return Shortcut(
+                [
+                    name,
+                    key_combination,
+                    selected_command,
+                    description,
+                    self.optional_arguments[0],
+                ]
+            )
+        else:
+            return Shortcut(
+                [
+                    name,
+                    key_combination,
+                    selected_command,
+                    description,
+                    [],
+                ]
+            )
