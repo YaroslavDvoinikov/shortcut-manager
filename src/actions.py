@@ -76,6 +76,7 @@ def info(command: int):
     elif command == 3:
         return "Stop recording screen"
 
+
 def stop_recording():
     if screen_record_started:
         recorder.stop_recording()

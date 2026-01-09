@@ -3,10 +3,10 @@ import sys
 
 from PySide6 import QtWidgets
 
+from src.actions import stop_recording
 from src.globallistener import GlobalListener
 from src.mainwindow import MainWindow
 from src.theme import reload_theme, set_app
-from src.actions import stop_recording
 
 os.environ.pop("QT_STYLE_OVERRIDE", None)
 os.environ["QT_LOGGING_RULES"] = "qt.qpa.wayland.textinput=false"
