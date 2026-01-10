@@ -75,8 +75,14 @@ def action(command: int, *args):
         case 6:
             global audio_record_started
             global frames
+            global pa
+            global stream
             if not audio_record_started:
                 audio_record_started = True
+                pa = pyaudio.PyAudio()
+                stream = pa.open(format=pyaudio.paInt16, channels=2,
+                                 rate=44400, input=True,
+                                 frames_per_buffer=1024)
                 frames = []
                 for i in range(0, int(44400 / 1024 * 4)):
                     data = stream.read(1024)
