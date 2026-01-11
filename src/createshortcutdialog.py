@@ -265,7 +265,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                     self.can_accept = False
             case 2:
                 dir = QFileDialog.getExistingDirectory(
-                    self, caption="Choose a directory where to save the screenshots"
+                    self, caption="Choose a directory where to save the recording"
                 )
                 if dir != "":
                     self.optional_arguments.append(dir)
@@ -277,7 +277,7 @@ class CreateShortcutDialog(QtWidgets.QDialog):
                     self.can_accept = False
             case 6:
                 dir = QFileDialog.getExistingDirectory(
-                    self, caption="Choose a directory where to save the screenshots"
+                    self, caption="Choose a directory where to save the recording"
                 )
                 if dir != "":
                     self.optional_arguments.append(dir)
